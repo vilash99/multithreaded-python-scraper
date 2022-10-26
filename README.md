@@ -1,8 +1,8 @@
-# multithreaded-python-scraper
+# Build Multi-Threaded Web Scraper in Python
 
-simple multithreaded crawler using Python with the help of Beautiful Soup library.
+For detail explaination of this code, please check blog https://www.kushalstudy.com/blog/how-to-build-multi-threaded-web-scraper-in-python/
+
 ## Libraries Needed
-
 BeautifulSoup: BeautifulSoup is a python library that makes it easy to scrape information from any web pages. It sits at top of an HTML or XML parser, providing Pythonic ways for iterating, searching, and modifying the parse tree. To install this library, type the following command in IDE/terminal.
 
 ```bash
