@@ -1,4 +1,4 @@
-# Build Multi-Threaded Web Scraper in Python
+# Multi-Threaded Web Scraper in Python
 
 For detail explaination of this code, please check blog https://www.kushalstudy.com/blog/how-to-build-multi-threaded-web-scraper-in-python/
 
