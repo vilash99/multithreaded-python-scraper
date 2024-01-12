@@ -1,3 +1,4 @@
+import re
 import requests
 from bs4 import BeautifulSoup
 import concurrent.futures
@@ -5,46 +6,58 @@ from urllib.parse import urljoin, urlparse
 
 
 class MultiThreadedScraper:
-
     def __init__(self, source_url):
         self.source_url = source_url
-        self.root_url = '{}://{}'.format(urlparse(self.source_url).scheme, urlparse(self.source_url).netloc)
+        self.root_url = (
+            f'{urlparse(self.source_url).scheme}:'
+            f'//{urlparse(self.source_url).netloc}'
+        )
         self.all_urls = set([])
-        self.total_threads = 5
+        self.total_threads = 10  # change total numbers of threads you want
 
-    def scrap_urls(self):
+    def scrape_urls(self):
+        """Scrape all urls present in given home page url"""
         page_data = requests.get(self.source_url).content
-        soup = BeautifulSoup(page_data, "lxml")
+        soup = BeautifulSoup(page_data, 'lxml')
 
-        all_urls = soup.find_all("a", class_="artical-card", href=True)
+        all_urls = soup.select('article.product_pod h3 a')
+
+        # Extract only books urls
         for link in all_urls:
             url = urljoin(self.root_url, link['href'])
             self.all_urls.add(url)
 
-
-    def scrap_pages(self, page_url):
+    def scrape_pages(self, page_url):
         page_data = requests.get(page_url).content
-        soup = BeautifulSoup(page_data, "lxml")
+        soup = BeautifulSoup(page_data, 'lxml')
 
-        # Extract Title
-        blog_title = soup.find("h1", class_="blog-title").text.strip()
+        # Scrape book title
+        title = soup.select('h1')[0].text.strip()
 
-        # Extract Category
-        blog_category = soup.find("a", class_="blog-category-name").text.strip()
+        # Scrape price
+        price = soup.select('p.price_color')[0].text.strip()
 
-        # Extract Likes
-        blog_total_likes = soup.find("span", class_="like-count").text.strip()
+        # Scrape total stocks
+        quantity = soup.select('p.instock')[0].text.strip()
 
-        print("URL: {}, Title: {}, Category: {}, Likes: {}".format(page_url, blog_title, blog_category, blog_total_likes))
-        print("*"*20)
+        match = re.search(r'\b((\d+)\b)', quantity)
+        if match:
+            quantity = int(match.group(1))  # Extract number as integer
+        else:
+            quantity = 0
+
+        print(
+            f'URL: {page_url}, Title: {title}, '
+            f'Price: {price}, Quantity: {quantity}'
+        )
 
     def start_scraper(self):
-        # Scrap url content concurrently
+        """Begin concurrent scraper"""
         with concurrent.futures.ThreadPoolExecutor(self.total_threads) as executor:
-        	executor.map(self.scrap_pages, self.all_urls)
+            executor.map(self.scrape_pages, self.all_urls)
 
 
 if __name__ == '__main__':
-    cc = MultiThreadedScraper("https://www.kushalstudy.com/")
-    cc.scrap_urls()
+    cc = MultiThreadedScraper('https://books.toscrape.com/')
+    cc.scrape_urls()
     cc.start_scraper()
