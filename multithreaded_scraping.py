@@ -6,6 +6,13 @@ from urllib.parse import urljoin, urlparse
 
 
 class MultiThreadedScraper:
+    """
+    MultiThreadedScraper build using concurrent features
+    param:
+    obj = MultiThreadedScraper('<url_to_scrape>')
+    obj.scrape_urls()
+    obj.start_scraper()
+    """
     def __init__(self, source_url):
         self.source_url = source_url
         self.root_url = (
